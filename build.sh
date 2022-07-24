@@ -73,7 +73,7 @@ for pluginSrc in ${pluginSources[@]}; do
       ;;
     release)
       _build_dest=$PLUGIN_RELEASE_LOC
-      cp -v $RELEASE_NAME $_build_dest
+      # cp -v $RELEASE_NAME $_build_dest
       _copy_exit_code="$?"
       ;;
     *)
