@@ -16,8 +16,8 @@ const uint REQ_TIME_IN_GAME = 10000;
 const float _UNBIND_TEXT_FONT_SIZE = 24.;
 const float _UNBIND_TITLE_FONT_SIZE = 20.;
 
-const string unbind = "UNBIND";
-const string rebind = "REBIND";
+const string unbind = "Unbind";
+const string rebind = "Rebind";
 
 const float TAU = Math::Asin(-1) * 2;
 
@@ -105,13 +105,6 @@ class UnbindPrompt {
     // flag for tracking if we unbound giveUp this map/session
     bool session_giveUpUnbound = false;
 
-
-    // todo
-    ShowUI ShouldShowUI() {
-        // show the UI when: we need to unbind or rebind giveup
-        return ShowUI::No;
-    }
-
     UnbindPrompt() {
         State_hasBeenInGame = false;
         // set the icon for this session.
@@ -174,6 +167,7 @@ class UnbindPrompt {
         // if HWI is false and WizardShouldRun is true, then hideWhenIrrelevant is false.
         bool hideWhenIrrelevant = !(!Setting_HideWhenIrrelevant || State_WizardShouldRun);
         bool isPreview = State_WizardShouldRun;
+        show = show || isPreview;
 
         /* show always if this is false; but not if it's unsafe */
         show = show || (!hideWhenIrrelevant && (appropriateUiSeq || inMenu));
@@ -210,8 +204,6 @@ class UnbindPrompt {
 
         // draw window
         UI::SetNextWindowPos(int(_pos.x), int(_pos.y), UI::Cond::Appearing);
-        // UI::SetNextWindowSize(int(_dims.x), int(_dims.y), UI::Cond::FirstUseEver);
-        // UI::SetNextWindowSize(800, 300);
         string _title = IconifyTitle(PLUGIN_TITLE, true);
         if (isPreview) _title += " (Preview)";
 
@@ -231,6 +223,7 @@ class UnbindPrompt {
 #if DEV
         cols += 1;
 #endif
+        string msg;  // button text
         UI::BeginGroup();
             if (UI::BeginTable("header", cols, UI::TableFlags::SizingStretchProp)) {
                 for (int i = 0; i < cols-2; i++) UI::TableSetupColumn('', UI::TableColumnFlags::WidthStretch);
@@ -249,39 +242,10 @@ class UnbindPrompt {
 
                 UI::TableNextColumn();
                 if (UI::IsOverlayShown()) {
-                    string msg = isGiveUpBound ? "Bind 'Give Up' to 'Respawn'" : "Rebind 'Give Up'";
+                    msg = isGiveUpBound ? "Bind 'Give Up' to 'Respawn'" : "Rebind 'Give Up'";
                     if (MDisabledButton(gi.app.Operation_InProgress, msg)) {
-                        if (isGiveUpBound) {
-                            auto pad = GetPadWithGiveUpBound();
-                            gi.BindInput(GetActionIndex(RESPAWN_ACTION_NAME), pad);
-                            // gi.UnbindInput(pad);
-                        } else {
-                            auto pad = GetFirstPadGiveUpBoundOrDefault();
-                            // if (Setting_PadType == PadType::AnyInputButMouse)
-                            //     @pad = null;
-                            gi.BindInput(GetActionIndex(GIVE_UP_ACTION_NAME), pad);
-                        }
+                        TriggerRebindPrompt();
                     }
-                    // if (Setting_ShowBindWarning) {
-                    //     AddSimpleTooltip(
-                    //         "\\$f91" + "Warning: do not rebind keys at certain moments.\n" +
-                    //         "\n" +
-                    //         "\\$fff" + "Trackmania will break if the rebind dialog is active during certian events.\n" +
-                    //         "\\$fd4" + "All input breaks and a game restart is required!\n" +
-                    //         "\\$fff" + "Particularly, this occurs when:\n" +
-                    //         "- you finish a lap, the lap ends, or warmup ends,\n" +
-                    //         "- changing or loading maps, and\n" +
-                    //         "- changing or joining servers, and\n" +
-                    //         "- certain UI sequences activate.\n" +
-                    //         "\n" +
-                    //         "With default settings, this reminder prompt will only show up when it's safe to rebind,\n" +
-                    //         "and disappears 10s before the server changes maps. Don't dilly dally.\n"+
-                    //         "\n" +
-                    //         "Rule-of-thumb:\\$2f5 it's safe in the menu, intro scene and when you can control the car.\n"
-                    //         "\n" +
-                    //         "\\$fff" + "This warning can be disabled in settings."
-                    //     );
-                    // }
 
                     UI::TableNextColumn();
                     auto lockToggle = !Setting_PromptLocked ? Icons::Unlock : Icons::Lock;
@@ -312,7 +276,7 @@ class UnbindPrompt {
         UI::EndGroup();
 
         // nvg stuff after ImGui, but before we End() so that we can do buttons and things, still.
-        DrawUnbindMain();
+        DrawUnbindMain(msg);
 
         UI::End();
 
@@ -327,7 +291,7 @@ class UnbindPrompt {
         trace("Changing game mode to: " + p);
     }
 
-    void DrawUnbindMain() {
+    void DrawUnbindMain(const string &in msg) {
         nvg::Reset();
 
         auto _pos = Setting_Pos;
@@ -360,11 +324,11 @@ class UnbindPrompt {
         nvg::FontFace(btnFont);
         nvg::FontSize(_font_size * Setting_WindowScale);
         nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);
-        nvg::TextBox(_pos.x, _wDims.y + _pos.y + _ubTxtXY.y/2, _ubTxtXY.x, (isGiveUpBound ? unbind : rebind) + "\n'GIVE UP'");
+        nvg::TextBox(_pos.x, _wDims.y + _pos.y + _ubTxtXY.y/2, _ubTxtXY.x, (isGiveUpBound ? unbind : rebind).ToUpper() + "\n'GIVE UP'");
 
         // msg underneath with bindings
         nvg::BeginPath();
-        nvg::Rect(_pos.x, bottomOfMainMsg, _ubTxtXY.x, auxMsgHeight);
+        nvg::Rect(_pos.x, bottomOfMainMsg, _ubTxtXY.x, auxMsgHeight * 2.0);
         nvg::FillColor(vec4(0,0,0,.9));
         nvg::Fill();
         nvg::ClosePath();
@@ -375,6 +339,8 @@ class UnbindPrompt {
         nvg::FontSize(14 * Setting_WindowScale);
         nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);
         nvg::TextBox(_pos.x, bottomOfMainMsg + auxMsgHeight/2, _ubTxtXY.x, "Currently bound: " + array2str(giveUpBindings));
+        nvg::TextBox(_pos.x, bottomOfMainMsg + auxMsgHeight*1.5, _ubTxtXY.x, msg + ": Ctrl + Shift + " + VirtKeyToString(Setting_ShortcutKey));
+        // nvg::TextBox(_pos.x, bottomOfMainMsg + auxMsgHeight*1.5, _ubTxtXY.x, (isGiveUpBound ? unbind : rebind) + " Shortcut: Ctrl+Shift+" + VirtKeyToString(Setting_ShortcutKey));
     }
 
     void RenderMenu() {

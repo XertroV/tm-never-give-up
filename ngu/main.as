@@ -1,14 +1,8 @@
-// todo: it looks like `#IF DEVELOP` is possible; not sure how yet
-// ! update: define it in info.toml -- check other projects for examples
 const bool DEV_MODE = true;
 
 // used to rate-limit game type log msgs
 uint64 lastPrint = 0;
 
-// This seems to be constant, but might not be
-// ! it's not for controllers
-// const uint GIVE_UP_ACTION_INDEX = 7;
-// const uint RESET_ACTION_INDEX = 8;
 const string GIVE_UP_ACTION_NAME = "Give up";
 const string RESPAWN_ACTION_NAME = "Respawn";
 /* player inputs count = 15 for KB and 19 for GamePad */
@@ -26,7 +20,6 @@ string[] giveUpBindings;
 string prevBindings = "";
 
 
-
 CTrackMania@ GetTmApp() {
    return cast<CTrackMania>(GetApp());
 }
@@ -39,6 +32,7 @@ void Main() {
 #if TMNEXT
    auto app = GetTmApp();
    startnew(LoopCheckBinding);
+   startnew(CoroInitBindings);
    IsGiveUpBound();
 
    while (unbindPrompt is null) {
@@ -49,16 +43,17 @@ void Main() {
    DebugPrintBindings();
 #endif
 
-   auto pg = cast<CSmArenaClient>(app.CurrentPlayground);
-   while (pg is null) {
-      yield();
-   }
-
 #else
-   warn("Never Give Up is only compatible with TM2020. It doesn't do anything in other games.");
 #endif
+   warn("Never Give Up is only compatible with TM2020. It doesn't do anything in other games.");
+   UI::ShowNotification("Never Give Up is only compatible with TM2020.", "It doesn't do anything in other games.", vec4(.4, .2, .2, .7));
 }
 
+void CoroInitBindings() {
+   // NGU can't do much if the bindings aren't initialized, so one second after the plugin is loaded, let's make sure they are initialized.
+   sleep(1000);
+   gi.GetManiaPlanetScriptApi().InputBindings_UpdateList(CGameManiaPlanetScriptAPI::EInputsListFilter::All, GetFirstPadGiveUpBoundOrDefault());
+}
 
 void LoopCheckBinding() {
    while (true) {
@@ -126,7 +121,6 @@ bool IsGiveUpBoundAux() {
    auto _in = app.MenuManager.MenuCustom_CurrentManiaApp.Input;
    string binding;
    giveUpBindings.RemoveRange(0, giveUpBindings.Length);
-   // auto curAM = UI::CurrentActionMap();
    CInputScriptPad@ firstPad;
    for (uint i = 0; i < pads.Length; i++) {
       auto pad = app.InputPort.Script_Pads[i];
@@ -149,7 +143,6 @@ bool IsGiveUpBoundAux() {
 
 
 bool CheckPadOkaySettings(CInputScriptPad@ pad) {
-   // CInputScriptPad::EPadType
    if (Setting_PadType == PadType::Keyboard)
       return pad.Type == CInputScriptPad::EPadType::Keyboard;
    if (Setting_PadType == PadType::Mouse)
@@ -160,9 +153,6 @@ bool CheckPadOkaySettings(CInputScriptPad@ pad) {
          || pad.Type == CInputScriptPad::EPadType::PlayStation
          || pad.Type == CInputScriptPad::EPadType::Vive
          ;
-   // if (Setting_PadType == PadType::AnyInputButMouse)
-   //    return pad.Type != CInputScriptPad::EPadType::Mouse;
-   // if Setting_PadType == AnyInputDevice then we'll return true anyway.
    return true;
 }
 
@@ -247,49 +237,35 @@ void Render() {
    Wizard::Render();
 }
 
+bool ctrlDown = false;
+bool shiftDown = false;
+bool scutKeyDown = false;
 
-// This is disabled atm b/c of the bug with blocking input.
-// Possible Solutions:
-// - deal with it, if your respawning it's less of a problem
-// - figure out how to call the unbind/rebind functions in TM2020: not exposed via any Nod (I think) so would need to be done via some `Dev::*` method :/.
-//   - note: I've tried to do some reverse engineering of TM to find the function call but not much luck. I have found the reset counter and some stuff associated with the unbind dialog, tho.
-// - just call the unbind / bind dialogs instead via a button click or something
-// - just show a notification to the user when the a key is bound to "Give Up"
-//   - this we can test easily via `app.MenuManager.MenuCustom_CurrentManiaApp.Input.GetActionBinding(pad, "Vehicle", "GiveUp");`
-// Non-solutions:
-// - there are some calls like `app.SystemOverlay.OpenInputSettings()` -- all the available ones I can find do one of:
-//   - open the old settings interface (not the correct one for TM2020)
-//   - crash the game
-//   - nothing
 UI::InputBlocking OnKeyPress(bool down, VirtualKey key) {
-   return UI::InputBlocking::DoNothing;
-   /*
-   string actionMap = UI::CurrentActionMap();
-   // if (actionMap == "MenuInputsMap" || !Setting_Enabled) {
-   if (actionMap != "Vehicle" || !Setting_Enabled) {
-      return UI::InputBlocking::DoNothing;
+   switch (key) {
+      case VirtualKey::Control: ctrlDown = down; break;
+      case VirtualKey::Shift: shiftDown = down; break;
+   }
+   if (key == Setting_ShortcutKey)
+      scutKeyDown = down;
+
+   if (Setting_Enabled && State_CurrentlyVisible && ctrlDown && shiftDown && scutKeyDown) {
+      ctrlDown = shiftDown = scutKeyDown = false;
+      TriggerRebindPrompt();
    }
 
-   // print("Key (" + key + ") " + (down ? "pressed" : "released"));
-
-   if (true || down) {
-      // todo: handle an override key
-      //   0. set override key to 'up' on map load
-      //   1. track override key up/down status
-      //   2. check if override key is down when Delete is pressed
-
-      bool appropriateMatch = IsRankedOrCOTD();
-
-      // note: whether we check for down or not doesn't seem to matter
-
-      if (down && key == Setting_KeyGiveUp && appropriateMatch) {
-         // print("Blocked give up!");
-         // return UI::InputBlocking::Block;
-         print("Attempting disallowing self respawn instead");
-      }
-   }
    return UI::InputBlocking::DoNothing;
-   */
+}
+
+
+void TriggerRebindPrompt() {
+   if (isGiveUpBound) {
+      auto pad = GetPadWithGiveUpBound();
+      gi.BindInput(GetActionIndex(RESPAWN_ACTION_NAME), pad);
+   } else {
+      auto pad = GetFirstPadGiveUpBoundOrDefault();
+      gi.BindInput(GetActionIndex(GIVE_UP_ACTION_NAME), pad);
+   }
 }
 
 
@@ -335,22 +311,6 @@ bool IsRankedOrCOTD() {
          unbindPrompt.OnNewMode();
       }
    }
-
-   /*
-    ? Note: We might be able to get the game mode also via:
-    ? - `ManiaPlanetScriptAPI.CurrentServerModeName`
-    ? - `MenuManager.NetworkGameModeName`
-    */
-
-   // if (DEV_MODE) {
-   //    // debug: print the current game mode for gathering relevant game modes
-   //    // we don't want to fill up the logs with 1+ lines each frame, tho, so only print at most every so many seconds.
-   //    uint64 now = Time::get_Now();
-   //    if (now - lastPrint > 5000) {
-   //       lastPrint = now;
-   //       print("CurGameModeStr = " + server_info.CurGameModeStr);
-   //    }
-   // }
 
    return ret;
 }
