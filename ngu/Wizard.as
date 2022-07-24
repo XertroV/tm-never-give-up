@@ -1,5 +1,5 @@
 namespace Wizard {
-    Resources::Font@ font = Resources::GetFont("DroidSans.ttf", 20);
+    UI::Font@ font = UI::LoadFont("DroidSans.ttf", 20);
 
     int currWizardSlide = 0;
 
@@ -27,10 +27,11 @@ namespace Wizard {
     }
 
     void RenderSlide(int slideIx) {
-        if (slideIx == 0) RenderOpeningSlide();
-        else if (slideIx == 1) RenderDoneSlide();
-        else {
-            UI::Text("unknown slide: " + slideIx);
+        switch (slideIx) {
+            case 0: RenderOpeningSlide(); break;
+            case 1: RenderHowItWorksSlide(); break;
+            case 2: RenderDoneSlide(); break;
+            default: UI::Text("unknown slide: " + slideIx);
         }
     }
 
@@ -48,7 +49,7 @@ namespace Wizard {
         VPad();
         UI::TextWrapped("A preview of the NGU prompt should appear shortly.");
         Sep();
-        UI::TextWrapped("What input device do you want NGU to use? (You can change this in settings later.)");
+        UI::TextWrapped("What input device do you want NGU to use?\n\\$999(You can change this in settings later.)");
         VPad();
         auto currPt = PadTypeToStr(Setting_PadType);
         if (UI::BeginCombo("Input Device", currPt, UI::ComboFlags::HeightLarge)) {
@@ -64,18 +65,41 @@ namespace Wizard {
         VPad();
         UI::TextWrapped("If the preview has appeared, you should see the current bindings for your selected input device.");
         Sep();
-        if (UI::Button("Next")) {
+        if (UI::Button(Icons::AngleDoubleRight + " How to Never Give Up " + Icons::AngleDoubleLeft)) {
+            currWizardSlide++;
+        }
+    }
+
+    void RenderHowItWorksSlide() {
+        UI::TextWrapped("How does Never Give Up (NGU) work?");
+        VPad();
+        UI::TextWrapped("In COTD, ranked, etc, if someone accidentally hits 'Give Up' they probably wanted to respawn, instead.");
+        Sep();
+        UI::TextWrapped("So, NGU gives you a super quick and easy way to bind your 'Give Up' key to 'Respawn' (for those game modes) and then reminds you to rebind 'Give Up' once you're back in the menu (or in an ordinary game mode again).");
+        Sep();
+        UI::TextWrapped("Why don't you give it a try now?\nClick \\$3ad[ " + UnbindBtnMsg() + " ]\\$z\nOr, press \\$fd2Ctrl + Shift + " + VirtKeyToString(Setting_ShortcutKey));
+        UI::TextWrapped("(Then try doing it again.)");
+        Sep();
+        if (UI::Button("Zoom Zoom")) {
             currWizardSlide++;
         }
     }
 
     void RenderDoneSlide() {
-        UI::TextWrapped("\\$5e8    You're done! Gz.");
+        UI::Dummy(vec2(0, 10));
+        UI::Dummy(vec2(130, 0));
+        UI::SameLine();
+        UI::TextWrapped("\\$5e8 You're done! Gz.");
         VPad();
         UI::TextWrapped("The preview will go away when you close this window.");
         VPad();
+        UI::TextWrapped("Feedback, suggestions, and requests welcome: @XertroV on the Openplanet discord.");
+        VPad();
+        UI::Dummy(vec2(65, 0));
+        UI::SameLine();
         if (UI::Button("Never Give Up! Never Surrender!")) {
             State_WizardShouldRun = false;
         }
+        UI::Dummy(vec2(0, 30));
     }
 }

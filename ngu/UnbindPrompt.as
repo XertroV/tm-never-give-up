@@ -46,6 +46,10 @@ vec2 _UnbindTextXY() {
     return _UNBIND_TEXT_XY * Setting_WindowScale;
 }
 
+string UnbindBtnMsg() {
+    return isGiveUpBound ? "Bind 'Give Up' to 'Respawn'" : "Rebind 'Give Up'";
+}
+
 int prevUiSequence = 0;
 int lastUiSequence = 0;
 int timeInGame = 0;
@@ -97,8 +101,10 @@ class UnbindPrompt {
 
     LastAction lastAction = NoAction;
 
-    Resources::Font@ btnFont;
-    Resources::Font@ inlineTitleFont;
+    UI::Font@ btnFont;
+    UI::Font@ inlineTitleFont;
+    int nvgFont;
+    int nvgBoldFont;
 
     // flag to track whether giveup was bound last frame
     bool last_giveUpBound = true;
@@ -109,8 +115,10 @@ class UnbindPrompt {
         State_hasBeenInGame = false;
         // set the icon for this session.
         sessionIcon = GetIcon(Time::get_Now());
-        @btnFont = Resources::GetFont("DroidSans-Bold.ttf", _UNBIND_TITLE_FONT_SIZE * Setting_WindowScale);
-        @inlineTitleFont = Resources::GetFont("DroidSans.ttf", _UNBIND_TEXT_FONT_SIZE, -1, -1, true, true);
+        @btnFont = UI::LoadFont("DroidSans-Bold.ttf", _UNBIND_TITLE_FONT_SIZE * Setting_WindowScale);
+        @inlineTitleFont = UI::LoadFont("DroidSans.ttf", _UNBIND_TEXT_FONT_SIZE, -1, -1, true, true);
+        nvgFont = nvg::LoadFont("DroidSans.ttf", true, true);
+        nvgBoldFont = nvg::LoadFont("DroidSans-Bold.ttf", true, true);
 
         // set up state stuff
         OnNewMode();
@@ -242,7 +250,7 @@ class UnbindPrompt {
 
                 UI::TableNextColumn();
                 if (UI::IsOverlayShown()) {
-                    msg = isGiveUpBound ? "Bind 'Give Up' to 'Respawn'" : "Rebind 'Give Up'";
+                    msg = UnbindBtnMsg();
                     if (MDisabledButton(gi.app.Operation_InProgress, msg)) {
                         TriggerRebindPrompt();
                     }
@@ -321,7 +329,7 @@ class UnbindPrompt {
         nvg::FillColor((_WHITE - bgColor) * vec4(.1, .1, .1, 1));
         // nvg::StrokeWidth(20);  // stroke on text doens't seem to work :(
         // nvg::Stroke();
-        nvg::FontFace(btnFont);
+        nvg::FontFace(nvgBoldFont);
         nvg::FontSize(_font_size * Setting_WindowScale);
         nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);
         nvg::TextBox(_pos.x, _wDims.y + _pos.y + _ubTxtXY.y/2, _ubTxtXY.x, (isGiveUpBound ? unbind : rebind).ToUpper() + "\n'GIVE UP'");
@@ -335,7 +343,7 @@ class UnbindPrompt {
 
         // giveUpBindings
         nvg::FillColor(_WHITE);
-        nvg::FontFace(inlineTitleFont);
+        nvg::FontFace(nvgFont);
         nvg::FontSize(14 * Setting_WindowScale);
         nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);
         nvg::TextBox(_pos.x, bottomOfMainMsg + auxMsgHeight/2, _ubTxtXY.x, "Currently bound: " + array2str(giveUpBindings));

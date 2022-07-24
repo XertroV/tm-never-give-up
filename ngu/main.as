@@ -44,9 +44,9 @@ void Main() {
 #endif
 
 #else
-#endif
    warn("Never Give Up is only compatible with TM2020. It doesn't do anything in other games.");
    UI::ShowNotification("Never Give Up is only compatible with TM2020.", "It doesn't do anything in other games.", vec4(.4, .2, .2, .7));
+#endif
 }
 
 void CoroInitBindings() {
