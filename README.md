@@ -1,7 +1,7 @@
 # Never Give Up (Openplanet Plugin for TM2020)
 
 This plugin will give you an easy button to unbind 'Give Up' in COTD (and ranked), along with a high-visibility reminder prompt that will automatically disappear when 'Give Up' is unbound.
-When you return to a menu or different game mode, you'll be prompted to rebind 'Give Up' (with a button to do so).
+When you return to a menu or different game mode, you'll be prompted to rebind 'Give Up' (with a button to do so, and a keyboard shortcut too).
 
 To experiment with the plugin, uncheck the "Hide UI in menus and for other game modes?" setting. The UI should be visible.
 
@@ -28,6 +28,6 @@ I guess that the 'bind input' dialog needs to redirect inputs to itself, but whe
 
 GitHub Repo: [https://github.com/XertroV/tm-never-give-up](https://github.com/XertroV/tm-never-give-up)
 
-License: MIT
+License: Public Domain
 
 GL HF
