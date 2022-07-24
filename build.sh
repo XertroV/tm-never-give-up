@@ -22,6 +22,7 @@ pluginSources=( 'ngu' )
 for pluginSrc in ${pluginSources[@]}; do
   # if we don't have `dos2unix` below then we need to add `\r` to the `tr -d`
   PLUGIN_PRETTY_NAME="$(cat ./$pluginSrc/info.toml | dos2unix | grep '^name' | cut -f 2 -d '=' | tr -d '\"\r' | sed 's/^[ ]*//')"
+  PLUGIN_VERSION="$(cat ./$pluginSrc/info.toml | dos2unix | grep '^version' | cut -f 2 -d '=' | tr -d '\"\r' | sed 's/^[ ]*//')"
 
   # prelim stuff
   case $_build_mode in
@@ -43,7 +44,7 @@ for pluginSrc in ${pluginSources[@]}; do
   _colortext16 green "✅ Output file/folder name: ${PLUGIN_NAME}"
 
   BUILD_NAME=$PLUGIN_NAME-$(date +%s).zip
-  RELEASE_NAME=$PLUGIN_NAME-latest.op
+  RELEASE_NAME=$PLUGIN_NAME-$PLUGIN_VERSION.op
   PLUGINS_DIR=${PLUGINS_DIR:-$HOME/win/OpenplanetNext/Plugins}
   PLUGIN_DEV_LOC=$PLUGINS_DIR/$PLUGIN_NAME
   PLUGIN_RELEASE_LOC=$PLUGINS_DIR/$RELEASE_NAME
@@ -85,7 +86,7 @@ for pluginSrc in ${pluginSources[@]}; do
     _colortext16 red "⚠ Error: could not copy plugin to Trackmania directory. You might need to click\n\t\`F3 > Scripts > TogglePlugin > PLUGIN\`\nto unlock the file for writing."
     _colortext16 red "⚠   Also, \"Stop Recent\" and \"Reload Recent\" should work, too, if the plugin is the \"recent\" plugin."
   else
-    _colortext16 green "✅ Copied plugin to Trackmania directory: ${_build_dest}"
+    _colortext16 green "✅ Built release version: ${RELEASE_NAME}"
   fi
 
 
