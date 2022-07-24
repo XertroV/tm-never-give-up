@@ -55,6 +55,7 @@ void TextHeading(string t) {
 /* sorta functional way to draw elements dynamically as a list or row or other things. */
 
 funcdef void DrawUiElems();
+funcdef void DrawUiElemsWRef(ref@ r);
 funcdef void DrawUiElemsF(DrawUiElems@ f);
 
 void DrawAsRow(DrawUiElemsF@ f, const string &in id, int cols = 64) {
@@ -82,4 +83,44 @@ void DrawAs2Cols(const string &in c1, const string &in c2) {
     UI::Text(c1);
     UI::TableNextColumn();
     UI::Text(c2);
+}
+
+/* horiz centering */
+
+int TableFlagsFixed() {
+    return UI::TableFlags::SizingFixedFit;
+}
+int TableFlagsFixedSame() {
+    return UI::TableFlags::SizingFixedSame;
+}
+int TableFlagsStretch() {
+    return UI::TableFlags::SizingStretchProp;
+}
+int TableFlagsStretchSame() {
+    return UI::TableFlags::SizingStretchSame;
+}
+int TableFBorders() {
+    return UI::TableFlags::Borders;
+}
+
+void DrawCenteredInTable(const string &in tableId, DrawUiElems@ f) {
+    /* cast the function to a ref so we can delcare an anon function that casts it back to a normal function and then calls it. */
+    DrawCenteredInTable(tableId, function(ref@ _r){
+        DrawUiElems@ r = cast<DrawUiElems@>(_r);
+        r();
+    }, f);
+}
+
+void DrawCenteredInTable(const string &in tableId, DrawUiElemsWRef@ f, ref@ r) {
+    if (UI::BeginTable(tableId, 3, TableFlagsStretch())) { //  | TableFBorders()
+        /* CENTERING!!! */
+        UI::TableSetupColumn(tableId + "-left", UI::TableColumnFlags::WidthStretch);
+        UI::TableSetupColumn(tableId + "-content", UI::TableColumnFlags::WidthFixed);
+        UI::TableSetupColumn(tableId + "-right", UI::TableColumnFlags::WidthStretch);
+        UI::TableNextColumn();
+        UI::TableNextColumn();
+        f(r);
+        UI::TableNextColumn();
+        UI::EndTable();
+    }
 }

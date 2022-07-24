@@ -14,7 +14,7 @@ string keyBoundToGiveUp;
 string gameMode;
 string lastGameMode;
 
-bool isGiveUpBound;
+bool isGiveUpBound = true;
 
 string[] giveUpBindings;
 string prevBindings = "";

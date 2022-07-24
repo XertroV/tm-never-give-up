@@ -74,13 +74,32 @@ void RenderSettingsCustomModesTab() {
     );
 }
 
+// past wizard state
+
+[Setting hidden]
+bool State_WizardShouldRun = true;
+
+bool HasRunPastWizard() {
+    // add all wizard versions here in a big AND (then NOT the result).
+    return !(State_WizardShouldRun && State_WizardShouldRun);
+}
+
+[Setting hidden]
+bool State_WizardShouldRun_22_07_04 = true;
+
+bool GetLatestWizardShouldRun() {
+    return State_WizardShouldRun_22_07_04;
+}
+
+void SetLatestWizardShouldRun(bool wsr) {
+    State_WizardShouldRun_22_07_04 = wsr;
+}
+
+// general state
 
 bool State_CurrentlyVisible = true;
 bool State_UserDidUnbindWhenPrompted = false;
 bool State_hasBeenInGame = false;
-
-[Setting hidden]
-bool State_WizardShouldRun = true;
 
 [SettingsTab name="Plugin State"]
 void RenderSettingsPluginState() {
@@ -93,6 +112,6 @@ void RenderSettingsPluginState() {
     State_hasBeenInGame = UI::Checkbox("Has been in game?", State_hasBeenInGame);
     AddSimpleTooltip("Set to false on initial game load.");
 
-    State_WizardShouldRun = UI::Checkbox("Wizard should run?", State_WizardShouldRun);
+    SetLatestWizardShouldRun(UI::Checkbox("Wizard should run?", GetLatestWizardShouldRun()));
     AddSimpleTooltip("True initially and then false forever more.");
 }

@@ -158,7 +158,7 @@ class UnbindPrompt {
         bool inputsInitialized = InputBindingsInitialized();
 
         // don't show up before we've ever joined a game; unless we show the UI most of the time anyway
-        if (!State_hasBeenInGame && Setting_HideWhenIrrelevant && !State_WizardShouldRun) {
+        if (!State_hasBeenInGame && Setting_HideWhenIrrelevant && !GetLatestWizardShouldRun()) {
             return;
         }
 
@@ -173,8 +173,8 @@ class UnbindPrompt {
         show = show && HasOkayPad();  // only show if we have an appropriate pad
 
         // if HWI is false and WizardShouldRun is true, then hideWhenIrrelevant is false.
-        bool hideWhenIrrelevant = !(!Setting_HideWhenIrrelevant || State_WizardShouldRun);
-        bool isPreview = State_WizardShouldRun;
+        bool hideWhenIrrelevant = !(!Setting_HideWhenIrrelevant || GetLatestWizardShouldRun());
+        bool isPreview = GetLatestWizardShouldRun();
         show = show || isPreview;
 
         /* show always if this is false; but not if it's unsafe */

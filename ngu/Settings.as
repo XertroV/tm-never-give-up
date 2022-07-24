@@ -35,7 +35,7 @@ bool Setting_BlockDelRanked = true;
 [Setting category="General" name="Show reminder when 'Give up' is bound in Knockout (TM_Knockout_Online)"]
 bool Setting_BlockDelKO = true;
 
-[Setting category="General" name="Keyboard / GamePad / Mouse?" description="If you select AnyInputDevice, you might not be able to rebind buttons on gamepad. API limitation."]
+[Setting category="General" name=" Keyboard / GamePad / Mouse?" description="If you select AnyInputDevice, you might not be able to rebind buttons on gamepad. API limitation."]
 PadType Setting_PadType = PadType::Keyboard;
 // CInputScriptPad::EPadType Setting_PadType = CInputScriptPad::EPadType::Keyboard;
 
@@ -50,10 +50,10 @@ UI WINDOW
 
 */
 
-[Setting category="General" name="Window Scale" min=1.0 max=5]
+[Setting category="General" name=" Window Scale" min=1.0 max=5]
 float Setting_WindowScale = 2.0;
 
-[Setting category="General" name="Position"]
+[Setting category="General" name=" Position (x, y)"]
 vec2 Setting_Pos = vec2(200, 66);
 
 // [Setting category="General" name="Dimensions"]
@@ -65,5 +65,5 @@ bool Setting_PromptLocked = false;
 // [Setting category="General" name="Show warning under bind/rebind button?" description="It's dangerous to rebind sometimes, so it's good to be warned."]
 // bool Setting_ShowBindWarning = true;
 
-[Setting category="General" name="Shortcut Key | Ctrl+Shift+__" description="To be pressed in combination with Ctrl+Shift. Example: Selecting 'D' will allow pressing Ctrl+Shift+D instead of clicking the 're/unbind' button.\\$6af Note: this shortcut is only active when the prompt is showing. If you'd like a shortcut key that works all the time, check out Rebind Master+ in the Plugin Manager."]
+[Setting category="General" name=" Shortcut Key" description="To be pressed in combination with Ctrl+Shift. Example: Selecting 'D' will allow pressing Ctrl+Shift+D instead of clicking the 're/unbind' button.\\$6af Note: this shortcut is only active when the prompt is showing. If you'd like a shortcut key that works all the time, check out Rebind Master+ in the Plugin Manager."]
 VirtualKey Setting_ShortcutKey = VirtualKey::D;
