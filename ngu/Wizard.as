@@ -63,7 +63,7 @@ namespace Wizard {
         });
         if (HasRunPastWizard()) {
             DrawCenteredInTable(uiId + "-new-features", function() {
-                UI::Text(rainbowLoopColorCycle("New Features!", true, -3.0));
+                UI::Text("New Features!");
             });
         }
         UI::TextWrapped("A preview of the NGU prompt should appear shortly.");

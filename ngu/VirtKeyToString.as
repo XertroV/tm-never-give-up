@@ -1,3 +1,4 @@
+/*
 dictionary@ virtKeyLookup = {
     {tostring(VirtualKey::LButton), "LButton"},
     {tostring(VirtualKey::RButton), "RButton"},
@@ -173,7 +174,10 @@ dictionary@ virtKeyLookup = {
     {tostring(VirtualKey::Pa1), "Pa1"},
     {tostring(VirtualKey::OemClear), "OemClear"}
 };
+*/
 
 string VirtKeyToString(VirtualKey key) {
-    return string(virtKeyLookup[tostring(key)]);
+    // return string(virtKeyLookup[tostring(key)]);
+    auto parts = tostring(key).Split("::");
+    return parts[parts.Length - 1];
 }

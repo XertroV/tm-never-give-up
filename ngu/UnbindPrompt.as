@@ -232,7 +232,7 @@ class UnbindPrompt {
         cols += 1;
 #endif
         string msg;  // button text
-        UI::BeginGroup();
+        if (UI::BeginChild("ngu-header")) {
             if (UI::BeginTable("header", cols, UI::TableFlags::SizingStretchProp)) {
                 for (int i = 0; i < cols-2; i++) UI::TableSetupColumn('', UI::TableColumnFlags::WidthStretch);
                 for (int i = 0; i < 2; i++) UI::TableSetupColumn('btns', UI::TableColumnFlags::WidthFixed);
@@ -249,7 +249,7 @@ class UnbindPrompt {
 #endif
 
                 UI::TableNextColumn();
-                if (UI::IsOverlayShown()) {
+                // if (UI::IsOverlayShown()) {
                     msg = UnbindBtnMsg();
                     if (MDisabledButton(gi.app.Operation_InProgress, msg)) {
                         TriggerRebindPrompt();
@@ -274,14 +274,15 @@ class UnbindPrompt {
                         State_CurrentlyVisible = false;
                     }
                     AddSimpleTooltip("Hide until next time you should unbind.");
-                } else {
-                    UI::AlignTextToFramePadding();
-                    UI::Text("\\$f81Show UI/Overlay for buttons.");
-                }
+                // } else {
+                //     UI::AlignTextToFramePadding();
+                //     UI::Text("\\$f81Show UI/Overlay for buttons.");
+                // }
 
                 UI::EndTable();
             }
-        UI::EndGroup();
+        }
+        UI::EndChild();
 
         // nvg stuff after ImGui, but before we End() so that we can do buttons and things, still.
         DrawUnbindMain(msg);
@@ -352,7 +353,6 @@ class UnbindPrompt {
     }
 
     void RenderMenu() {
-        // todo: take out spaces from titleized
         if (UI::MenuItem(IconifyTitle(PLUGIN_TITLE), "", Setting_Enabled)) {
             Setting_Enabled = !Setting_Enabled;
         }

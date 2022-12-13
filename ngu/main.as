@@ -58,7 +58,7 @@ void CoroInitBindings() {
 void LoopCheckBinding() {
    while (true) {
       isGiveUpBound = IsGiveUpBound();
-      sleep(60); // ~16.7x per second at most
+      sleep(200); // 5x per second
    }
 }
 
@@ -158,6 +158,7 @@ bool CheckPadOkaySettings(CInputScriptPad@ pad) {
 
 // CInputScriptPad@ firstPadGUBound;
 int firstPadGUBoundIx = -1;
+// NOTE: I believe this will interfere with
 CInputScriptPad@ GetPadWithGiveUpBound() {
       // todo check setting for controller
    auto app = GetTmApp();
@@ -346,4 +347,38 @@ void DebugPrintBindings() {
 
 void debugPrint(const string &in msg) {
    print("\\$29f" + msg);
+}
+
+
+const string _dictIndent = "  ";
+string dict2str(dictionary@ dict) {
+   auto ks = dict.GetKeys();
+   string[] lines;
+   for (uint i = 0; i < ks.Length; i++) {
+      lines.InsertLast(_dictIndent + "{ '" + ks[i] + "', " + dGetBool(dict, ks[i]) + " }");
+   }
+   if (lines.Length == 0) {
+      return "{ }";
+   }
+   auto body = string::Join(lines, "\n");
+   return "{\n" + body + "\n}";
+}
+
+
+string array2str(string[] &in arr) {
+   string[] lines;
+   for (uint i = 0; i < arr.Length; i++) {
+      lines.InsertLast("'" + arr[i] + "'");
+   }
+   if (lines.Length == 0) {
+      return "[ ]";
+   }
+   return "[" + string::Join(lines, ", ") + "]";
+}
+
+
+bool dGetBool(dictionary@d, const string &in k) {
+   bool ret;
+   d.Get(k, ret);
+   return ret;
 }

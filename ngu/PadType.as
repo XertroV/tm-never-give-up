@@ -5,17 +5,17 @@ enum PadType {
     Keyboard = 0,
     Mouse = 1,
     GamePad = 2,
-    // AnyInputButMouse = 6,
     AnyInputDevice = 7,
 }
+    // AnyInputButMouse = 6,
 
 const PadType[] ALL_PAD_TYPES = {
    PadType::Keyboard,
    PadType::Mouse,
    PadType::GamePad
+};
 //    PadType::AnyInputButMouse,
 //    PadType::AnyInputDevice  // remove from this list so we don't show it in wiz
-};
 
 string PadTypeToStr(PadType pt) {
    if (pt == PadType::Keyboard) return "Keyboard";

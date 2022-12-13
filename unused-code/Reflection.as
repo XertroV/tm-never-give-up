@@ -32,39 +32,3 @@ void printNameAndType(string varName, CMwNod@ nod) {
    auto ty = Reflection::TypeOf(nod);
    print("VAR/TYPE: " + varName + " :: " + (ty is null ? "null" : ty.Name));
 }
-
-
-
-
-bool dGetBool(dictionary@d, string k) {
-   bool ret;
-   d.Get(k, ret);
-   return ret;
-}
-
-
-const string _dictIndent = "  ";
-string dict2str(dictionary@ dict) {
-   auto ks = dict.GetKeys();
-   string[] lines;
-   for (uint i = 0; i < ks.Length; i++) {
-      lines.InsertLast(_dictIndent + "{ '" + ks[i] + "', " + dGetBool(dict, ks[i]) + " }");
-   }
-   if (lines.Length == 0) {
-      return "{ }";
-   }
-   auto body = string::Join(lines, "\n");
-   return "{\n" + body + "\n}";
-}
-
-
-string array2str(string[] arr) {
-   string[] lines;
-   for (uint i = 0; i < arr.Length; i++) {
-      lines.InsertLast("'" + arr[i] + "'");
-   }
-   if (lines.Length == 0) {
-      return "[ ]";
-   }
-   return "[" + string::Join(lines, ", ") + "]";
-}

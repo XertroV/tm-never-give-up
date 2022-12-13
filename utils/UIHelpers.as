@@ -5,7 +5,7 @@ UI::Font@ stdBold = UI::LoadFont("DroidSans-Bold.ttf", 16, -1, -1, true, true);
 
 /* tooltips */
 
-void AddSimpleTooltip(string msg) {
+void AddSimpleTooltip(const string &in msg) {
     if (UI::IsItemHovered()) {
         UI::BeginTooltip();
         UI::Text(msg);
@@ -42,7 +42,7 @@ void PaddedSep() {
 
 /* heading */
 
-void TextHeading(string t) {
+void TextHeading(const string &in t) {
     UI::PushFont(headingFont);
     VPad();
     UI::Text(t);

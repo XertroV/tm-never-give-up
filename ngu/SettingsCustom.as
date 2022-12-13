@@ -81,7 +81,7 @@ bool State_WizardShouldRun = true;
 
 bool HasRunPastWizard() {
     // add all wizard versions here in a big AND (then NOT the result).
-    return !(State_WizardShouldRun && State_WizardShouldRun);
+    return !(State_WizardShouldRun && State_WizardShouldRun_22_07_04);
 }
 
 [Setting hidden]
