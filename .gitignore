@@ -1,4 +1,5 @@
 *.zip
 *.7z
-*.op
 *.psd
+*-dev-*.op
+*-latest.op
