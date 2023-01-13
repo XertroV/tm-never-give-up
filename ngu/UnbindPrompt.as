@@ -101,7 +101,6 @@ class UnbindPrompt {
 
     LastAction lastAction = NoAction;
 
-    UI::Font@ btnFont;
     UI::Font@ inlineTitleFont;
     int nvgFont;
     int nvgBoldFont;
@@ -114,9 +113,8 @@ class UnbindPrompt {
     UnbindPrompt() {
         State_hasBeenInGame = false;
         // set the icon for this session.
-        sessionIcon = GetIcon(Time::get_Now());
-        @btnFont = UI::LoadFont("DroidSans-Bold.ttf", _UNBIND_TITLE_FONT_SIZE * Setting_WindowScale);
-        @inlineTitleFont = UI::LoadFont("DroidSans.ttf", _UNBIND_TEXT_FONT_SIZE, -1, -1, true, true);
+        sessionIcon = GetIcon(Time::Now);
+        @inlineTitleFont = UI::LoadFont("DroidSans.ttf", 26, -1, -1, true, true);
         nvgFont = nvg::LoadFont("DroidSans.ttf", true, true);
         nvgBoldFont = nvg::LoadFont("DroidSans-Bold.ttf", true, true);
 
