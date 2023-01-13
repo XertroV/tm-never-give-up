@@ -1,1 +1,8 @@
-ngu/info.toml
+[meta]
+name        = "Never Give Up"
+author      = "XertroV"
+category    = "Race"
+version     = "0.3.3"
+
+[script]
+#__DEFINES__

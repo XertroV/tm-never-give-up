@@ -21,8 +21,8 @@ pluginSources=( 'ngu' )
 
 for pluginSrc in ${pluginSources[@]}; do
   # if we don't have `dos2unix` below then we need to add `\r` to the `tr -d`
-  PLUGIN_PRETTY_NAME="$(cat ./$pluginSrc/info.toml | dos2unix | grep '^name' | cut -f 2 -d '=' | tr -d '\"\r' | sed 's/^[ ]*//')"
-  PLUGIN_VERSION="$(cat ./$pluginSrc/info.toml | dos2unix | grep '^version' | cut -f 2 -d '=' | tr -d '\"\r' | sed 's/^[ ]*//')"
+  PLUGIN_PRETTY_NAME="$(cat ./info.toml | dos2unix | grep '^name' | cut -f 2 -d '=' | tr -d '\"\r' | sed 's/^[ ]*//')"
+  PLUGIN_VERSION="$(cat ./info.toml | dos2unix | grep '^version' | cut -f 2 -d '=' | tr -d '\"\r' | sed 's/^[ ]*//')"
 
   # prelim stuff
   case $_build_mode in
@@ -49,7 +49,7 @@ for pluginSrc in ${pluginSources[@]}; do
   PLUGIN_DEV_LOC=$PLUGINS_DIR/$PLUGIN_NAME
   PLUGIN_RELEASE_LOC=$PLUGINS_DIR/$RELEASE_NAME
 
-  7z a ./$BUILD_NAME ./$pluginSrc/* ./LICENSE ./README.md
+  7z a ./$BUILD_NAME ./$pluginSrc/* ./info.toml ./LICENSE ./README.md
 
   cp -v $BUILD_NAME $RELEASE_NAME
 
@@ -64,6 +64,7 @@ for pluginSrc in ${pluginSources[@]}; do
       mkdir -p $_build_dest/
       rm -vr $_build_dest/*
       cp -LR -v ./$pluginSrc/* $_build_dest/
+      cp -LR -v ./info.toml $_build_dest/
       _copy_exit_code="$?"
       sed -i 's/^\(name[ \t="]*\)\(.*\)"/\1\2 (Dev)"/' $_build_dest/info.toml
       sed -i 's/^#__DEFINES__/defines = ["DEV"]/' $_build_dest/info.toml
