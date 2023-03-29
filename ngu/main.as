@@ -3,8 +3,8 @@ const bool DEV_MODE = true;
 // used to rate-limit game type log msgs
 uint64 lastPrint = 0;
 
-const string GIVE_UP_ACTION_NAME = "Give up";
-const string RESPAWN_ACTION_NAME = "Respawn";
+const string GIVE_UP_ACTION_NAME = "|Input|Give up";
+const string RESPAWN_ACTION_NAME = "|Input|Respawn";
 /* player inputs count = 15 for KB and 19 for GamePad */
 
 const string PLUGIN_TITLE = "Never Give Up!";
@@ -30,7 +30,11 @@ UnbindPrompt unbindPrompt = UnbindPrompt();
 
 void Main() {
 #if TMNEXT
-   auto app = GetTmApp();
+
+#if DEV
+   DebugPrintBindings();
+#endif
+
    startnew(LoopCheckBinding);
    startnew(CoroInitBindings);
    IsGiveUpBound();
@@ -38,11 +42,6 @@ void Main() {
    while (unbindPrompt is null) {
       yield();
    }
-
-#if DEV
-   DebugPrintBindings();
-#endif
-
 #else
    warn("Never Give Up is only compatible with TM2020. It doesn't do anything in other games.");
    UI::ShowNotification("Never Give Up is only compatible with TM2020.", "It doesn't do anything in other games.", vec4(.4, .2, .2, .7));
@@ -341,7 +340,7 @@ void DebugPrintBindings() {
    MwFastBuffer<wstring> bs = GameInfo().GetManiaPlanetScriptApi().InputBindings_Bindings;
    MwFastBuffer<wstring> as = GameInfo().GetManiaPlanetScriptApi().InputBindings_ActionNames;
    for (uint i = 0; i < bs.Length; i++) {
-      print("  \\$39f" + string(as[i]) + ": " + string(bs[i]));
+      print("  \\$39f`" + string(as[i]) + "`: " + string(bs[i]));
    }
 }
 
